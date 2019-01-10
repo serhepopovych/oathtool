@@ -1,0 +1,54 @@
+SYNOPSIS
+--------
+This wrapper is for demonstration purposes on how TFA (2FA)
+authentication can easily be implemented with shell scripting language.
+It uses oathtool(1) default event-based HOTP mode.
+
+It can be used as replacement for FreeOTA or other TFA agents in trusted
+environments (see SECURITY NOTICE below).
+
+SECURITY NOTICE
+---------------
+Both @key and @counter values are passed in clear text as parameters
+to oathtool(1) and can be easily seen with process monitoring utilities
+like ps(1) or directly via /proc/<pid>/cmdline.
+
+Comment in wrapper explicitly notes place where this happened.
+
+Assuming this you should only use this wrapper in trusted environment
+where no process or user monitors for process command line parameters
+for purpose of stealing security sensitive information.
+
+An modification to oathtool(1) to accept security sensitive parameters
+through environment variables or via file should be made to make
+oathtool(1) usage more secure.
+
+DEPENDENCIES
+------------
+Make sure you have installed and working POSIX compatible shell (e.g.
+bash or dash), coreutils, lockfile-progs and oathtool.
+
+Tested and found to be working on Ubuntu 16.04 LTS and CentOS 7.x.
+Should work on any other distro as long as dependencies are meet.
+
+USAGE
+-----
+Wrapper supports multi-user and multi-profile environment. Profiles are
+subdirectories under ~/.config/oathtool contain key and counter files.
+
+One of the profiles can be marked as default by symlinking it to default
+target. It will be used when wrapper called without parameters:
+
+  ~/.config/oathtool/
+                    default -> profile1
+                    profile1
+                    profile2
+
+  $ ~/bin/oathtool.sh '' ''
+  usage: oathtool.sh [profile]
+
+Both key and counter files can be encrypted using gpg(1) key to store
+confidential data securely. This mode is off by default and requires
+working gpg(1) configuration before turning on (edit wrapper and change
+use_gpg to "yes"). Configuring gpg(1) is beyond of the scope of this
+README.
